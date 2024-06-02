@@ -17,7 +17,7 @@ All examples using at least __C++20__ and have been tested and compiled with `Cl
 ## Example 1: Consteval Templated Tensor Class <a name="example-1"></a>
 __[example_1.cpp](examples/example_1.cpp)__
 ### Overview
-This example demonstrates a consteval templated tensor class that performs operations at compile time. The code generates and executes tensor operations without generating any assembly code, showcasing the efficiency of compile-time computations.
+This example showcasing the efficiency of compile-time computations by creating tensor objects via a consteval templated class and performs an addition of 2 tensors of different types at compile time.
 
 ### Code Example
 
