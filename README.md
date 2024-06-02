@@ -7,7 +7,7 @@ This repository highlights, through examples, how to write more efficient, safe,
  - [Environment](#environment)
  - [Examples](#example)
    - [1) Consteval Templated Tensor Class](#example-1)
- - [License](License)
+ - [License](#license)
 
 ### Environment <a name="environment"></a>
 All examples using at least __C++20__ and have been tested and compiled with `Clang` and `GCC` via the [Compiler Explorer](https://godbolt.org). 
@@ -43,5 +43,5 @@ main:
 ```
 
 
-# License
+# License <a name="license"></a>
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
