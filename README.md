@@ -4,17 +4,17 @@ C++ is the most powerful language.
 This repository highlights, through examples, how to write more efficient, safe, and performant modern C++ code by leveraging static metaprogramming and compile-time evaluations.
 
 # Table of Contents
- - [Environment](environment)
- - [Examples]()
-   - [1) Consteval Templated Tensor Class](example-1-consteval-templated-tensor-class)
+ - [Environment](#environment)
+ - [Examples](#example)
+   - [1) Consteval Templated Tensor Class](#example-1)
  - [License](License)
 
 ### Environment <a name="environment"></a>
 All examples using at least __C++20__ and have been tested and compiled with `Clang` and `GCC` via the [Compiler Explorer](https://godbolt.org). 
 
 
-# Examples
-## Example 1: Consteval Templated Tensor Class
+# Examples <a name="example"></a>
+## Example 1: Consteval Templated Tensor Class <a name="example-1"></a>
 __[example_1.cpp](examples/example_1.cpp)__
 ### Overview
 This example demonstrates a consteval templated tensor class that performs operations at compile time. The code generates and executes tensor operations without generating any assembly code, showcasing the efficiency of compile-time computations.
