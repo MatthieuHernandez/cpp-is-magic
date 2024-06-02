@@ -1,7 +1,7 @@
-# C++ is Magic: Static and Consteval Examples
+# C++ is Magic: Compile-time Examples
 
 C++ is the most powerful language.
-This repository shows the power and magic of modern C++ through some static and consteval examples. This project highlights, through examples, how to write more efficient, safe, and performant code by leveraging static metaprogramming and compile-time evaluations.
+This repository highlights, through examples, how to write more efficient, safe, and performant modern C++ code by leveraging static metaprogramming and compile-time evaluations.
 
 # Table of Contents
  - [Environments](Environments)
@@ -10,16 +10,18 @@ This repository shows the power and magic of modern C++ through some static and 
  - [License](License)
 
 ### Environments
-All examples using __C++2b__ and have been tested and compiled with `Clang` and `GCC` via the [Compiler Explorer](https://godbolt.org). 
+All examples using at least __C++20__ and have been tested and compiled with `Clang` and `GCC` via the [Compiler Explorer](https://godbolt.org). 
 
 
 # Examples
 ## Example 1: Consteval Templated Tensor Class
+__[example_1.cpp](examples/example_1.cpp)__
 ### Overview
 This example demonstrates a consteval templated tensor class that performs operations at compile time. The code generates and executes tensor operations without generating any assembly code, showcasing the efficiency of compile-time computations.
 
 ### Code Example
-Complied with `x86-64 clang 18.1.0` using the following options `-std=c++2b -O3 -Wall -Wextra -Wpedantic -Werror`.
+
+Complied with `x86-64 clang 18.1.0` using the following options `-std=c++2a -O3 -Wall -Wextra -Wpedantic -Werror`.
 ```cpp
 int main() {
     static constexpr char encrypted_message[] = "Hello world!";
