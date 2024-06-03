@@ -1,0 +1,5 @@
+BasedOnStyle: Google
+IndentWidth: 4
+IndentAccessModifiers: false
+AccessModifierOffset: -2
+ColumnLimit: 100

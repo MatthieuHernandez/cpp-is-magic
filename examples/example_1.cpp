@@ -4,40 +4,33 @@
 template <typename CT, size_t S>
 class Tensor {
     using T = typename std::remove_const<CT>::type;
-public:
-    consteval Tensor()
-        : Tensor(nullptr) {}
 
-    consteval Tensor(const CT* data) {
-        for (size_t i = 0; i < S; ++i) {
-            this->data[i] = data ? data[i] : T{};
+  public:
+    consteval Tensor(const CT* data = nullptr) {
+        if (data != nullptr) {
+            for (size_t i = 0; i < S; ++i) {
+                this->data[i] = data[i];
+            }
         }
     }
 
-    constexpr const T* get_data() const {
-        return data;
-    }
+    consteval const T* get_data() const { return data; }
 
-    consteval size_t size() const {
-        return S;
-    }
+    consteval size_t size() const { return S; }
 
-    template<typename T2, size_t S2>
+    template <typename T2, size_t S2>
     consteval auto operator+(const Tensor<T2, S2>& other) const {
-
-        std::array<T, S> sum {};
-        for (size_t i = 0; i < size(); ++i) {
+        static_assert(S == S2, "Tensors must be the same size to be added.");
+        std::array<T, S> sum{};
+        for (size_t i = 0; i < this->size(); ++i) {
             sum[i] = this->data[i] + other.get_data()[i];
         }
-
         return Tensor<T, S>(sum.data());
     }
 
-    consteval std::string_view dump() const {
-        return std::string_view(data, S-1);
-    }
+    consteval std::string_view dump() const { return std::string_view(data, S - 1); }
 
-private:
+  private:
     T data[S] = {};
 };
 

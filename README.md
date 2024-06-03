@@ -24,12 +24,12 @@ This example showcasing the efficiency of compile-time computations by creating 
 Complied with `x86-64 clang 18.1.0` using the following options `-std=c++2a -O3 -Wall -Wextra -Wpedantic -Werror`.
 ```cpp
 int main() {
-    static constexpr char encrypted_message[] = "Hello world!";
-    static constexpr char decryption_key[] = {-5, -58, -65, -76, -6, 83, -87, -2, -17, -5, 5, 66, 0};
-    
-    static constexpr auto tensor_1 = Tensor(encrypted_message);
-    static constexpr auto tensor_2 = Tensor(decryption_key);
-    static constexpr auto tensor_3 = tensor_1 + tensor_2;
+    constexpr char encrypted_message[] = "Hello world!";
+    constexpr char decryption_key[] = {-5, -58, -65, -76, -6, 83, -87, -2, -17, -5, 5, 66, 0};
+
+    constexpr auto tensor_1 = Tensor(encrypted_message);
+    constexpr auto tensor_2 = Tensor(decryption_key);
+    constexpr auto tensor_3 = tensor_1 + tensor_2;
 
     static_assert(tensor_3.dump() == "C++ is magic");
     return 0;
