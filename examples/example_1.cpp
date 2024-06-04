@@ -16,7 +16,7 @@ class Tensor {
 
     consteval const T* get_data() const { return data; }
 
-    consteval size_t size() const { return S; }
+    static consteval size_t size() { return S; }
 
     template <typename T2, size_t S2>
     consteval auto operator+(const Tensor<T2, S2>& other) const {
@@ -39,7 +39,7 @@ Tensor(const CT (&)[S]) -> Tensor<CT, S>;
 
 int main() {
     constexpr char encrypted_message[] = "Hello world!";
-    constexpr char decryption_key[] = {-5, -58, -65, -76, -6, 83, -87, -2, -17, -5, 5, 66, 0};
+    constexpr int decryption_key[] = {-5, -58, -65, -76, -6, 83, -87, -2, -17, -5, 5, 66, 0};
 
     constexpr auto tensor_1 = Tensor(encrypted_message);
     constexpr auto tensor_2 = Tensor(decryption_key);

@@ -25,7 +25,7 @@ Complied with `x86-64 clang 18.1.0` using the following options `-std=c++2a -O3 
 ```cpp
 int main() {
     constexpr char encrypted_message[] = "Hello world!";
-    constexpr char decryption_key[] = {-5, -58, -65, -76, -6, 83, -87, -2, -17, -5, 5, 66, 0};
+    constexpr int decryption_key[] = {-5, -58, -65, -76, -6, 83, -87, -2, -17, -5, 5, 66, 0};
 
     constexpr auto tensor_1 = Tensor(encrypted_message);
     constexpr auto tensor_2 = Tensor(decryption_key);
