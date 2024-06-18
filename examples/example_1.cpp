@@ -1,5 +1,5 @@
 #include <array>
-#include <string>
+#include <string_view>
 
 template <typename CT, size_t S>
 class Tensor {
