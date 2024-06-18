@@ -8,12 +8,12 @@ namespace hide {
 template <typename T, size_t X, size_t Y>
 class Matrix {
   public:
-    constexpr Matrix(std::initializer_list<T>& init) {
+    constexpr Matrix(const std::initializer_list<T> init) {
         std::copy(init.begin(), init.end(), data.begin());
     }
 
     template <size_t X2, size_t Y2>
-    auto dotProduct(Matrix<T, X2, Y2>& matrice2) {
+    auto dotProduct(const Matrix<T, X2, Y2>& matrice2) const {
         static_assert(Y == X2, "Incompatible dimensions.");
         Matrix<T, X, Y2> result({});
         for (size_t i = 0; i < X; ++i) {
@@ -42,26 +42,26 @@ hide::Matrix<T, X, Y> Matrix(std::initializer_list<T> init) {
 }
 
 int main() {
-    auto a = Matrix<1, 3>({5, 6, 7});
-    auto b = Matrix<3, 1>({3, 2, 1});
+    const auto a = Matrix<1, 3>({5, 6, 7});
+    const auto b = Matrix<3, 1>({3, 2, 1});
     std::array ab{34};
     assert(a.dotProduct(b) == ab);
 
     std::array ba{15, 18, 21, 10, 12, 14, 5, 6, 7};
     assert(b.dotProduct(a) == ba);
 
-    auto c = Matrix<2, 2>({1, 2, 3, 4});
-    auto d = Matrix<2, 1>({8, 9});
+    const auto c = Matrix<2, 2>({1, 2, 3, 4});
+    const auto d = Matrix<2, 1>({8, 9});
     std::array cd{26, 60};
     assert(c.dotProduct(d) == cd);
 
-    auto e = Matrix<2, 2>({1, 2, 3, 6});
-    auto f = Matrix<2, 2>({4, 7, 2, 1});
+    const auto e = Matrix<2, 2>({1, 2, 3, 6});
+    const auto f = Matrix<2, 2>({4, 7, 2, 1});
     std::array ef{8, 9, 24, 27};
     assert(e.dotProduct(f) == ef);
 
-    auto g = Matrix<3, 3>({1, 2, 3, 4, 5, 6, 7, 8, 9});
-    auto h = Matrix<3, 3>({1, 2, 1, 2, 4, 6, 7, 2, 5});
+    const auto g = Matrix<3, 3>({1, 2, 3, 4, 5, 6, 7, 8, 9});
+    const auto h = Matrix<3, 3>({1, 2, 1, 2, 4, 6, 7, 2, 5});
     std::array gh{26, 16, 28, 56, 40, 64, 86, 64, 100};
     assert(g.dotProduct(h) == gh);
     return 0;
