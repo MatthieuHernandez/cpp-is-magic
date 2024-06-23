@@ -6,7 +6,7 @@ class Tensor {
     using T = typename std::remove_const<CT>::type;
 
   public:
-    consteval Tensor(const CT* data = nullptr) {
+    constexpr Tensor(const CT* data = nullptr) {
         if (data != nullptr) {
             for (size_t i = 0; i < S; ++i) {
                 this->data[i] = data[i];
@@ -19,7 +19,7 @@ class Tensor {
     static consteval size_t size() { return S; }
 
     template <typename T2, size_t S2>
-    consteval auto operator+(const Tensor<T2, S2>& other) const {
+    constexpr auto operator+(const Tensor<T2, S2>& other) const {
         static_assert(S == S2, "Tensors must be the same size to be added.");
         std::array<T, S> sum{};
         for (size_t i = 0; i < this->size(); ++i) {
