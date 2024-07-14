@@ -11,60 +11,62 @@ class more_precise {
     using T = typename std::remove_const<CT>::type;
 
   public:
-    more_precise(const T& v = {}) {
+    constexpr more_precise(const T& v = {}) {
         value_1 = v;
         split_values();
     }
 
-    T get() const { return value_1 + value_2; }
+    constexpr T get() const { return value_1 + value_2; }
 
-    more_precise(const more_precise<T>&& other) { this->operator=(other); }
+    constexpr more_precise(const more_precise<T>&& other) { this->operator=(other); }
 
-    more_precise(const more_precise<T>& other) { this->operator=(other); }
+    constexpr more_precise(const more_precise<T>& other) { this->operator=(other); }
 
-    more_precise<T>& operator=(const more_precise<T>&& other) {
+    constexpr more_precise<T>& operator=(const more_precise<T>&& other) {
         value_1 = other.value_1;
         value_2 = other.value_2;
         split_values();
         return *this;
     }
 
-    more_precise<T>& operator=(const more_precise<T>& other) {
+    constexpr more_precise<T>& operator=(const more_precise<T>& other) {
         value_1 = other.value_1;
         value_2 = other.value_2;
         split_values();
         return *this;
     }
 
-    more_precise<T> operator+(const more_precise<T>& other) const {
-        more_precise<T> result(*this);
-        result.value_1 += other.value_1;
-        result.value_2 += other.value_2;
+    constexpr more_precise<T> operator+(const more_precise<T>& other) const {
+        more_precise<T> result;
+        result.value_1 = value_1 + other.value_1;
+        result.value_2 = value_2 + other.value_2;
         return result;
     }
 
-    more_precise<T> operator-(const more_precise<T>& other) {
-        more_precise<T> result(*this);
-        result.value_1 -= other.value_1;
-        result.value_2 -= other.value_2;
+    constexpr more_precise<T> operator-(const more_precise<T>& other) const {
+        more_precise<T> result;
+        result.value_1 = value_1 - other.value_1;
+        result.value_2 = value_2 - other.value_2;
         return result;
     }
 
-    more_precise<T> operator*(more_precise<T> other) {
-        more_precise<T> result(*this);
+    constexpr more_precise<T> operator*(const more_precise<T>& other) const {
+        more_precise<T> result;
         result.value_1 = result.value_1 * other.value_1 + result.value_1 * other.value_2;
         result.value_2 = result.value_2 * other.value_1 + result.value_2 * other.value_2;
         return result;
     }
 
-    more_precise<T> operator/(more_precise<T> other) {
-        more_precise<T> result(*this);
+    constexpr more_precise<T> operator/(const more_precise<T>& other) const {
+        more_precise<T> result;
         result.value_1 = result.value_1 / (other.value_1 + other.value_2);
         result.value_2 = result.value_2 / (other.value_1 + other.value_2);
         return result;
     }
 
-    std::partial_ordering operator<=>(const more_precise<T>& other) const {
+    constexpr bool operator==(const more_precise<T>& other) const = default;
+
+    constexpr std::partial_ordering operator<=>(const more_precise<T>& other) const {
         if (value_1 < other.value_1) {
             return std::partial_ordering::less;
         } else if (value_1 > other.value_1) {
@@ -80,92 +82,66 @@ class more_precise {
         }
     }
 
-    void split_values() {
-        counter++;
-        static constexpr T split_factor = 1024;
-        if (value_2 < value_1 / split_factor) {
+    constexpr void split_values() {
+        static constexpr T split_factor = 256 * sizeof(T);
+        if ((value_2 < value_1 && value_1 > 0) || (value_2 > value_1 && value_1 < 0)) {
             T tmp_1 = value_1 * split_factor;
-            tmp_1 = std::floor(tmp_1);
+            // Equivalent to std::floor which is not yet constexpr.
+            tmp_1 = static_cast<T>(static_cast<long long>(tmp_1));
             tmp_1 = tmp_1 / split_factor;
             value_2 += (value_1 - tmp_1);
             value_1 = tmp_1;
         }
     }
-    static int32_t counter;
     T value_1{};
     T value_2{};
 };
 
-template <>
-int32_t more_precise<float>::counter = 0;
-
-template <>
-int32_t more_precise<double>::counter = 0;
-
-template <>
-int32_t more_precise<long double>::counter = 0;
-
 template <typename T>
-T get_epsilon() {
-    if (typeid(T) == typeid(float) || typeid(T) == typeid(more_precise<float>)) {
-        return 1e-7;
-    } else if (typeid(T) == typeid(double) || typeid(T) == typeid(more_precise<double>)) {
-        return 1e-14;
-    } else if (typeid(T) == typeid(long double) || typeid(T) == typeid(more_precise<long double>)) {
-        return 1e-14;
+static constexpr T square_root(const T& x) {
+    constexpr T zero = 0.0l;
+    if (x == zero) {
+        return x;
     }
-    assert(false);
-    return 0;
-}
-
-template <typename T>
-T square_root(T n) {
-    T zero = 0.0;
-    T epsilon = get_epsilon<T>();
-    T guess = n;
+    T guess = x;
     T previous_guess;
-    T diff;
-    T two = 2.0;
-    do {
+    constexpr T two = 2.0;
+    for (int8_t i = 50; i > 0; i--) {
         previous_guess = guess;
-        guess = (guess + n / guess) / two;
-        diff = guess - previous_guess;
-    } while (diff > epsilon || diff < (zero - epsilon));
-
+        guess = (guess + x / guess) / two;
+    }
     return guess;
 }
 
 template <typename T>
-T gauss_legendre_algorithm() {
-    static uint8_t n = 5;
-    static T a = 1.0l;
-    static T b = 1.0l / std::sqrt(2.0l);
-    static T p = 1.0l;
-    static T two = 2.0l;
-    static T four = 4.0l;
-    static T t = 1.0l / 4.0l;
-    if (n == 0) {
-        return ((a + b) * (a + b) / (four * t));
+static constexpr T gauss_legendre_algorithm() {
+    T two = 2.0l;
+    T four = 4.0l;
+    T a = 1.0l;
+    T b = 1.0l / square_root(2.0l);
+    T p = 1.0l;
+    T t = 1.0l / 4.0l;
+    for (int8_t i = 5; i > 0; i--) {
+        T a_next = (a + b) / two;
+        b = square_root(a * b);
+        t = t - p * (a - a_next) * (a - a_next);
+        p = two * p;
+        a = a_next;
     }
-    T a_next = (a + b) / two;
-    b = square_root(a * b);
-    t = t - p * (a - a_next) * (a - a_next);
-    p = two * p;
-    a = a_next;
-    n--;
-    return gauss_legendre_algorithm<T>();
+    return ((a + b) * (a + b) / (four * t));
 }
 
 int main() {
+    // float my_more_precise_pi = gauss_legendre_algorithm<more_precise<float>>().get();
+
     auto compare_pi = [](auto t) {
         using T = decltype(t);
         constexpr T std_pi = std::numbers::pi_v<T>;
-        T my_pi = gauss_legendre_algorithm<T>();
+        constexpr T my_pi = gauss_legendre_algorithm<T>();
         T my_more_precise_pi = gauss_legendre_algorithm<more_precise<T>>().get();
         std::cout << std::setprecision(23) << std_pi << std::endl;
         std::cout << std::setprecision(23) << my_pi << std::endl;
         std::cout << std::setprecision(23) << my_more_precise_pi << std::endl << std::endl;
-        std::cout << "counter = " << more_precise<T>::counter << std::endl << std::endl;
         // assert(my_pi != std_pi);
         // assert(my_more_precise_pi == std_pi);
         return 0;
@@ -174,6 +150,6 @@ int main() {
     auto iterate_types = [&](auto... types) { (compare_pi(types), ...); };
 
     using long_double = long double;
-    iterate_types(float{}, double{}, long_double{});
+    iterate_types(long_double{});
     return 0;
 }
