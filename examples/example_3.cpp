@@ -78,6 +78,7 @@ class more_precise {
         }
     }
 
+  private:
     constexpr void split_values() {
         static constexpr T split_factor = 128 * sizeof(T);
         if ((value_2 < value_1 && value_1 > 0) || (value_2 > value_1 && value_1 < 0)) {
