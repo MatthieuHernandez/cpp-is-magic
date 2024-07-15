@@ -97,7 +97,7 @@ This example shows how to perform complex compile-time calculations. A `more_pre
 
 ### Code Example
 
-Complied with `x86-64 clang 18.1.0` using the following options `-std=c++23 -O3 -Wall -Wextra -Wpedantic -Werror`.
+Complied with `x86-64 clang 18.1.0` using the following options `-std=c++23 -O3 -fno-fast-math -Wall -Wextra -Wpedantic -Werror`.
 ```cpp
 int main() {
     auto compare_pi = [](auto t) {
