@@ -1,12 +1,8 @@
-#include <cassert>
-#include <cmath>
 #include <compare>
 #include <cstdint>
-#include <iomanip>
-#include <iostream>
 #include <numbers>
 
-template <typename CT>
+template <std::floating_point CT>
 class more_precise {
     using T = typename std::remove_const<CT>::type;
 
@@ -52,15 +48,15 @@ class more_precise {
 
     constexpr more_precise<T> operator*(const more_precise<T>& other) const {
         more_precise<T> result;
-        result.value_1 = result.value_1 * other.value_1 + result.value_1 * other.value_2;
-        result.value_2 = result.value_2 * other.value_1 + result.value_2 * other.value_2;
+        result.value_1 = value_1 * other.value_1 + value_1 * other.value_2;
+        result.value_2 = value_2 * other.value_1 + value_2 * other.value_2;
         return result;
     }
 
     constexpr more_precise<T> operator/(const more_precise<T>& other) const {
         more_precise<T> result;
-        result.value_1 = result.value_1 / (other.value_1 + other.value_2);
-        result.value_2 = result.value_2 / (other.value_1 + other.value_2);
+        result.value_1 = value_1 / (other.value_1 + other.value_2);
+        result.value_2 = value_2 / (other.value_1 + other.value_2);
         return result;
     }
 
@@ -83,7 +79,7 @@ class more_precise {
     }
 
     constexpr void split_values() {
-        static constexpr T split_factor = 256 * sizeof(T);
+        static constexpr T split_factor = 128 * sizeof(T);
         if ((value_2 < value_1 && value_1 > 0) || (value_2 > value_1 && value_1 < 0)) {
             T tmp_1 = value_1 * split_factor;
             // Equivalent to std::floor which is not yet constexpr.
@@ -97,24 +93,25 @@ class more_precise {
     T value_2{};
 };
 
-template <typename T>
-static constexpr T square_root(const T& x) {
-    constexpr T zero = 0.0l;
-    if (x == zero) {
-        return x;
-    }
+template <typename CT>
+static CT constexpr square_root(CT x) {
+    using T = typename std::remove_const<CT>::type;
     T guess = x;
     T previous_guess;
-    constexpr T two = 2.0;
-    for (int8_t i = 50; i > 0; i--) {
+    T diff;
+    T two = 2.0;
+    for (int8_t i = 32; i > 0; i--) {
         previous_guess = guess;
         guess = (guess + x / guess) / two;
+        diff = guess - previous_guess;
     }
+
     return guess;
 }
 
-template <typename T>
-static constexpr T gauss_legendre_algorithm() {
+template <typename CT>
+static consteval CT gauss_legendre_algorithm() {
+    using T = typename std::remove_const<CT>::type;
     T two = 2.0l;
     T four = 4.0l;
     T a = 1.0l;
@@ -132,24 +129,19 @@ static constexpr T gauss_legendre_algorithm() {
 }
 
 int main() {
-    // float my_more_precise_pi = gauss_legendre_algorithm<more_precise<float>>().get();
-
     auto compare_pi = [](auto t) {
         using T = decltype(t);
         constexpr T std_pi = std::numbers::pi_v<T>;
         constexpr T my_pi = gauss_legendre_algorithm<T>();
-        T my_more_precise_pi = gauss_legendre_algorithm<more_precise<T>>().get();
-        std::cout << std::setprecision(23) << std_pi << std::endl;
-        std::cout << std::setprecision(23) << my_pi << std::endl;
-        std::cout << std::setprecision(23) << my_more_precise_pi << std::endl << std::endl;
-        // assert(my_pi != std_pi);
-        // assert(my_more_precise_pi == std_pi);
+        constexpr T my_more_precise_pi = gauss_legendre_algorithm<more_precise<T>>().get();
+        static_assert(my_pi != std_pi);
+        static_assert(my_more_precise_pi == std_pi);
         return 0;
     };
 
     auto iterate_types = [&](auto... types) { (compare_pi(types), ...); };
 
     using long_double = long double;
-    iterate_types(long_double{});
+    iterate_types(float{}, double{}, long_double{});
     return 0;
 }
