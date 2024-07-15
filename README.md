@@ -10,6 +10,9 @@ This repository highlights, through examples, how to write more efficient, safe,
      - With const and non-const type handling in the template.
    - [2) Compile-time dot product of matrices](#example-2)
      - Including a trick to partially deduce the template type.
+   - [3) Compile-time high-precision π calculation](#example-3)
+     - Using a class to reduce arrhythmic floating-point imprecision.
+     - Including a variadic lambda that iterates over different floating-point types.
  - [License](#license)
 
 ### Environment <a name="environment"></a>
@@ -87,6 +90,39 @@ main:
     ret
 ```
 
+## Example 3: Compile-time high-precision π calculation <a name="example-3"></a>
+__[example_3.cpp](examples/example_3.cpp)__
+### Overview
+This example shows how to perform complex compile-time calculations. A `more_precise<T>` class is used to bypass imprecision accumulation due to arrhythmic floating-point.
+
+### Code Example
+
+Complied with `x86-64 clang 18.1.0` using the following options `-std=c++23 -O3 -Wall -Wextra -Wpedantic -Werror`.
+```cpp
+int main() {
+    auto compare_pi = [](auto t) {
+        using T = decltype(t);
+        constexpr T std_pi = std::numbers::pi_v<T>;
+        constexpr T my_pi = gauss_legendre_algorithm<T>();
+        constexpr T my_more_precise_pi = gauss_legendre_algorithm<more_precise<T>>().get();
+        static_assert(my_pi != std_pi);
+        static_assert(my_more_precise_pi == std_pi);
+        return 0;
+    };
+
+    auto iterate_types = [&](auto... types) { (compare_pi(types), ...); };
+
+    using long_double = long double;
+    iterate_types(float{}, double{}, long_double{});
+    return 0;
+}
+```
+This code performs dot products without generating any assembly code.
+```assembly
+main:
+    xor    eax, eax
+    ret
+```
 
 # License <a name="license"></a>
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
